@@ -3,7 +3,7 @@ const categorieCheltuialaModel = (sequelize, DataTypes) => {
         id:{
             type: DataTypes.BIGINT,
             primaryKey: true,
-            autoIncreement: true
+            autoIncrement: true
         },
         denumire:{
             type: DataTypes.STRING,

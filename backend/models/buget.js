@@ -1,20 +1,24 @@
-const cheltuialaModel = (sequelize, DataTypes ) =>{
-    const cheltuiala = sequelize.define("cheltuiala",{
+const bugetModel = (sequelize, DataTypes) => {
+    const buget = sequelize.define("buget", {
         id:{
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrement: true
         },
+        totalitate_cheltuieli:{
+            type: DataTypes.BIGINT,
+            allowNull: false
+        },
+        perioada:{
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         suma:{
             type: DataTypes.FLOAT,
             allowNull: false
         },
-        data:{
+        data_inceput:{
             type: DataTypes.DATE,
-            allowNull: false
-        },
-        detalii:{
-            type: DataTypes.TEXT,
             allowNull: false
         }
     },{
@@ -22,7 +26,7 @@ const cheltuialaModel = (sequelize, DataTypes ) =>{
         underscored: true,
         freezeTableName: true
     })
-    return cheltuiala;
+    return buget;
 }
 
-module.exports = cheltuialaModel
+module.exports = bugetModel
