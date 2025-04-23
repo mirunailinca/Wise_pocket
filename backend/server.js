@@ -1,5 +1,7 @@
 const express = require("express")
 const db = require("./models").db 
+const allRoutes = require("./routes");
+
 
 const app = express()
 const port = 4848
@@ -20,6 +22,10 @@ app.get("/reset",async(req,res) => {
     }
 })
 
+
+app.use("/", allRoutes); 
+
+
 app.use("/",(req,res)=>{
     res.status(200).send("SERVER OK")
 })
@@ -28,3 +34,4 @@ app.listen(port, () =>{
     console.log(`Server is running on ${port}`)
     console.log(`http://localhost:${port}`)
 })
+
