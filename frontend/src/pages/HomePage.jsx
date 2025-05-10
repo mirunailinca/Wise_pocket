@@ -1,21 +1,36 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import '../App.css';
 
 const HomePage = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [cheltuieli, setCheltuieli] = useState([]);
+
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
 
-  const cheltuieli = [
-    { id: 1, categorie: "Alimente & bauturi", suma: -9 },
-    { id: 2, categorie: "Masina", suma: -6 },
-    { id: 3, categorie: "Altele", suma: -100 },
-    { id: 4, categorie: "Cumparaturi", suma: -200 },
-    { id: 5, categorie: "Cumparaturi", suma: -35 },
-  ];
+  useEffect(() => {
+    const fetchCheltuieli = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const decoded = jwtDecode(token);
+        const userId = decoded.id;
+
+        const response = await fetch(`http://localhost:4848/cheltuieli/user/${userId}`);
+        const data = await response.json();
+        setCheltuieli(data);
+      } catch (err) {
+        console.error("Eroare la preluarea cheltuielilor:", err);
+      }
+    };
+
+    fetchCheltuieli();
+  }, []);
 
   return (
     <div>
@@ -34,7 +49,7 @@ const HomePage = () => {
             <div className="dropdown-menu">
               <Link to="/profil">Profil</Link>
               <Link to="/sfaturi">Sfaturi</Link>
-              <Link to="/login">Deconectare</Link>
+              <Link to="/">Deconectare</Link>
             </div>
           )}
         </div>

@@ -1,3 +1,5 @@
+const { categorieCheltuiala } = require("../models");
+
 const CheltuialaDb = require("../models").cheltuiala;
 
 const controller = {
@@ -63,7 +65,22 @@ const controller = {
         }catch(err){
             res.status(500).send(err.message);
         }
-    }
+    },
+
+
+    getUltimeleCheltuieliByUser: async (req, res) => {
+        try {
+            const cheltuieli = await CheltuialaDb.findAll({
+                where: { id_utilizator: req.params.userId },
+                include: [{ model: CategorieDb, attributes: ["denumire"] }],
+                order: [["data", "DESC"]],
+                limit: 5
+            });
+            res.status(200).send(cheltuieli);
+        } catch (err) {
+            res.status(500).send(err.message);
+        }
+    },
 };
 
 module.exports = controller;

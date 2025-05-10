@@ -29,15 +29,6 @@ buget.belongsTo(utilizator)
 utilizator.hasMany(recompensa)
 recompensa.belongsTo(utilizator)
 
-// sincronizare baza de date
-db.sync({ alter: true })
-  .then(() => {
-    console.log("Baza de date a fost sincronizată cu modelele.");
-  })
-  .catch((err) => {
-    console.error("Eroare la sincronizarea bazei de date:", err);
-  });
-
 module.exports = {
     categorieCheltuiala,
     cheltuiala,

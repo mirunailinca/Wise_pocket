@@ -1,15 +1,21 @@
 const express = require("express")
 const db = require("./models").db 
 const allRoutes = require("./routes");
-const authRouter = require("./routes/auth");
+const authRoutes = require("./routes/auth");
+const cors = require("cors")
 
 
 const app = express()
 const port = 4848
 
+app.use(cors());
 app.use(express.json())
 
-
+app.use("/auth", authRoutes); // auth/signup si auth/login
+app.use("/", allRoutes); 
+app.get("/",(req,res)=>{
+    res.status(200).send("SERVER OK")
+})
 
 app.get("/reset",async(req,res) => {
     try {
@@ -23,18 +29,6 @@ app.get("/reset",async(req,res) => {
     }
 })
 
-app.use("/auth", authRouter);//AM STERS ACUM
-
-
-app.use("/", allRoutes); 
-
-
-// app.use("/",(req,res)=>{
-//     res.status(200).send("SERVER OK")
-// })
-app.use("*", (req, res) => {
-    res.status(404).send("Ruta nu există");
-  });
 
 app.listen(port, () =>{
     console.log(`Server is running on ${port}`)

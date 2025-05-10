@@ -1,26 +1,52 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import '../App.css';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log('Login încercat cu', email, password);
-    navigate('/general');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:4848/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, parola: password }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        alert("Eroare: " + err.message);
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+
+      const userData = jwtDecode(data.token);
+      if (userData.role === "admin") {
+        navigate("/admin-home");
+      } else {
+        navigate("/general");
+      }
+    } catch (err) {
+      console.error("Eroare login:", err);
+      alert("Eroare la conectare cu serverul.");
+    }
   };
 
   const handleSignUpRedirect = () => {
-    navigate('/signup');
+    navigate("/signup");
   };
 
   return (
     <div className="login-container">
       <h1>Login</h1>
       <input
-        type="email"
+        type="text"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -32,12 +58,8 @@ const LoginPage = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={handleLogin}>Conectează-te</button>
-
-      {/* Buton de redirect către Sign Up */}
       <p>Nu ai cont?</p>
-      <button onClick={handleSignUpRedirect} className="secondary-button">
-        Creează cont nou
-      </button>
+      <button onClick={handleSignUpRedirect}>Creează cont nou</button>
     </div>
   );
 };

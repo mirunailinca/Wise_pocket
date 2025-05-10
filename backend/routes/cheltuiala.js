@@ -8,4 +8,7 @@ router.post("/", cheltuialaController.createCheltuiala);
 router.put("/:id", cheltuialaController.updateCheltuiala);
 router.delete("/:id", cheltuialaController.deleteCheltuiala);
 
+router.get("/ultimele/:userId", cheltuialaController.getUltimeleCheltuieliByUser);
+
+
 module.exports = router;
