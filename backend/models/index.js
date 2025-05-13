@@ -14,12 +14,14 @@ const utilizator = utilizatorModel(db,sequelize)
 const recompensa = recompensaModel(db,sequelize) 
 
 //legatura catChelt cu cheltuiala
-categorieCheltuiala.hasMany(cheltuiala)
+categorieCheltuiala.hasMany(cheltuiala, { foreignKey: "categorie_cheltuiala_id" })
 cheltuiala.belongsTo(categorieCheltuiala)
 
+
 //legatura chelt utiliz
-utilizator.hasMany(cheltuiala)
+utilizator.hasMany(cheltuiala, { foreignKey: "utilizator_id" })
 cheltuiala.belongsTo(utilizator)
+
 
 //legatura buget utiliz
 utilizator.hasMany(buget)

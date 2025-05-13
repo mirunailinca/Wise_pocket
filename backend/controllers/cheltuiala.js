@@ -5,12 +5,13 @@ const CheltuialaDb = require("../models").cheltuiala;
 const controller = {
     createCheltuiala: async (req,res) => {
         try{
+            
             const cheltuiala = await CheltuialaDb.create({
                 suma: req.body.suma,
                 data: req.body.data,
                 detalii: req.body.detalii,
-                id_utilizator: req.body.id_utilizator,
-                id_categorie: req.body.id_categorie,
+                utilizator_id: req.body.id_utilizator, // corect
+                categorie_cheltuiala_id: req.body.id_categorie // corect
             });
             res.status(201).send(cheltuiala);
         }catch(err){
@@ -71,8 +72,8 @@ const controller = {
     getUltimeleCheltuieliByUser: async (req, res) => {
         try {
             const cheltuieli = await CheltuialaDb.findAll({
-                where: { id_utilizator: req.params.userId },
-                include: [{ model: CategorieDb, attributes: ["denumire"] }],
+                where: { utilizator_id: req.params.userId },
+                include: [{ model: categorieCheltuiala, attributes: ["denumire"] }],
                 order: [["data", "DESC"]],
                 limit: 5
             });

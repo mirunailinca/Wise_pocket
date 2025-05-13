@@ -1,28 +1,28 @@
-const cheltuialaModel = (sequelize, DataTypes ) =>{
-    const cheltuiala = sequelize.define("cheltuiala",{
-        id:{
+const cheltuialaModel = (sequelize, DataTypes) => {
+    const cheltuiala = sequelize.define("cheltuiala", {
+        id: {
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrement: true
         },
-        suma:{
+        suma: {
             type: DataTypes.FLOAT,
             allowNull: false
         },
-        data:{
+        data: {
             type: DataTypes.DATE,
             allowNull: false
         },
-        detalii:{
+        detalii: {
             type: DataTypes.TEXT,
             allowNull: false
         }
-    },{
-        
+    }, {
         underscored: true,
         freezeTableName: true
-    })
-    return cheltuiala;
-}
+    });
 
-module.exports = cheltuialaModel
+    return cheltuiala;
+};
+
+module.exports = cheltuialaModel;

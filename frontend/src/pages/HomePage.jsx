@@ -1,36 +1,83 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import '../App.css';
 
 const HomePage = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [suma, setSuma] = useState("");
+  const [data, setData] = useState("");
+  const [detalii, setDetalii] = useState("");
+  const [idCategorie, setIdCategorie] = useState("");
+  const [categorii, setCategorii] = useState([]);
   const [cheltuieli, setCheltuieli] = useState([]);
 
+  const toggleMenu = () => setShowMenu(!showMenu);
+  const toggleForm = () => setShowForm(!showForm);
 
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
+  const fetchCheltuieli = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+
+      const response = await fetch(`http://localhost:4848/cheltuieli/ultimele/${userId}`);
+      const data = await response.json();
+      console.log(data);//////////
+      setCheltuieli(data);
+    } catch (err) {
+      console.error("Eroare la preluarea cheltuielilor:", err);
+    }
+  };
+
+  const fetchCategorii = async () => {
+    try {
+      const response = await fetch("http://localhost:4848/categorii");
+      const data = await response.json();
+      setCategorii(data);
+    } catch (err) {
+      console.error("Eroare la preluarea categoriilor:", err);
+    }
   };
 
   useEffect(() => {
-    const fetchCheltuieli = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const decoded = jwtDecode(token);
-        const userId = decoded.id;
-
-        const response = await fetch(`http://localhost:4848/cheltuieli/user/${userId}`);
-        const data = await response.json();
-        setCheltuieli(data);
-      } catch (err) {
-        console.error("Eroare la preluarea cheltuielilor:", err);
-      }
-    };
-
     fetchCheltuieli();
+    fetchCategorii();
   }, []);
+
+  const handleAdaugaCheltuiala = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+
+      const response = await fetch("http://localhost:4848/cheltuieli", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          suma,
+          data,
+          detalii,
+          id_utilizator: userId,
+          id_categorie: idCategorie,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Eroare la adăugarea cheltuielii");
+
+      setSuma("");
+      setData("");
+      setDetalii("");
+      setIdCategorie("");
+      setShowForm(false);
+      fetchCheltuieli(); // reîncarcă lista
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
   return (
     <div>
@@ -42,9 +89,7 @@ const HomePage = () => {
           <Link to="/bugete">Bugete</Link>
         </div>
         <div className="right-menu">
-          <button onClick={toggleMenu} className="menu-button">
-            ☰
-          </button>
+          <button onClick={toggleMenu} className="menu-button">☰</button>
           {showMenu && (
             <div className="dropdown-menu">
               <Link to="/profil">Profil</Link>
@@ -60,32 +105,79 @@ const HomePage = () => {
         <h1>Bine ai venit la WisePocket!</h1>
         <p>Administrează-ți bugetul într-un mod simplu și eficient</p>
 
-        {/* Cadrane */}
         <div className="dashboard-container">
-          {/* Primul cadran - Istoric Cheltuieli */}
+          {/* Istoric Cheltuieli */}
           <div className="card">
             <div className="card-header">
               <h2>Istoric Cheltuieli</h2>
-              <button className="add-button">+</button>
+              <button className="add-button" onClick={toggleForm}>+</button>
             </div>
+
+            {showForm && (
+              <div className="modal-overlay" onClick={() => setShowForm(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="close-button" onClick={() => setShowForm(false)}>×</button>
+                  <h3>Adaugă Cheltuială</h3>
+                  <form onSubmit={handleAdaugaCheltuiala} className="form-adaugare">
+                    <input
+                      type="number"
+                      placeholder="Suma"
+                      value={suma}
+                      onChange={(e) => setSuma(e.target.value)}
+                      required
+                    />
+                    <input
+                      type="date"
+                      value={data}
+                      onChange={(e) => setData(e.target.value)}
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Detalii"
+                      value={detalii}
+                      onChange={(e) => setDetalii(e.target.value)}
+                    />
+                    <select
+                      value={idCategorie}
+                      onChange={(e) => setIdCategorie(e.target.value)}
+                      required
+                    >
+                      <option value="">Selectează categorie</option>
+                      {categorii.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.denumire}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit">Adaugă</button>
+                  </form>
+                </div>
+              </div>
+            )}
+
             <ul className="cheltuieli-list">
-              {cheltuieli.map((item) => (
-                <li key={item.id} className="cheltuiala-item">
-                  <div className="left">
-                    <strong>{item.categorie}</strong>
-                  </div>
-                  <div className="right">
-                    {item.suma} RON
-                  </div>
-                </li>
-              ))}
+              {cheltuieli.length === 0 ? (
+                <p style={{ textAlign: "center", color: "#888" }}>
+                  Nu au fost adăugate cheltuieli
+                </p>
+              ) : (
+                cheltuieli.map((item) => (
+                  <li key={item.id} className="cheltuiala-item">
+                    <div className="left">
+                    <strong>{item.categorie_cheltuiala?.denumire || "Fără categorie"}</strong>
+                    </div>
+                    <div className="right">{item.suma} RON</div>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 
           {/* Al doilea cadran */}
           <div className="card">
             <h2>Al doilea cadran</h2>
-            {/* Adaug mai târziu */}
+            {/* viitor conținut */}
           </div>
         </div>
       </div>
