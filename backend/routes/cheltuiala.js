@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { cheltuialaController } = require("../controllers");
 
+router.get("/cheltuieli/ultima-luna/:userId", cheltuialaController.getCheltuieliUltimaLunaByUser);
 router.get("/ultimele/:userId", cheltuialaController.getUltimeleCheltuieliByUser);
 router.get("/", cheltuialaController.getAllCheltuieli);
 router.get("/:id", cheltuialaController.getCheltuialaById);

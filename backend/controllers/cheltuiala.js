@@ -82,6 +82,35 @@ const controller = {
             res.status(500).send(err.message);
         }
     },
+    getCheltuieliUltimaLunaByUser: async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const today = new Date();
+        const lastMonth = new Date();
+        lastMonth.setMonth(today.getMonth() - 1);
+
+        const cheltuieli = await CheltuialaDb.findAll({
+            where: {
+                utilizator_id: userId,
+                data: {
+                    [Op.gte]: lastMonth
+                }
+            },
+            include: [
+                {
+                    model: categorieCheltuiala,
+                    attributes: ["denumire"]
+                }
+            ],
+            order: [["data", "DESC"]]
+        });
+
+        res.status(200).send(cheltuieli);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+},
+
 };
 
 module.exports = controller;

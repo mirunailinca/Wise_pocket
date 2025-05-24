@@ -24,7 +24,7 @@ cheltuiala.belongsTo(utilizator)
 
 
 //legatura buget utiliz
-utilizator.hasMany(buget)
+utilizator.hasMany(buget,{foreignKey: "utilizator_id"})
 buget.belongsTo(utilizator)
 
 //legatura recompensa utiliz

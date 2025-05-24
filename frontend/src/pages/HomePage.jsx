@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Plot from 'react-plotly.js';
+import * as d3 from 'd3-scale-chromatic';
 import '../App.css';
 
 const HomePage = () => {
@@ -12,6 +14,8 @@ const HomePage = () => {
   const [idCategorie, setIdCategorie] = useState("");
   const [categorii, setCategorii] = useState([]);
   const [cheltuieli, setCheltuieli] = useState([]);
+  const [plotData, setPlotData] = useState(null);
+
 
   const toggleMenu = () => setShowMenu(!showMenu);
   const toggleForm = () => setShowForm(!showForm);
@@ -27,6 +31,30 @@ const HomePage = () => {
       const data = await response.json();
       console.log(data);//////////
       setCheltuieli(data);
+
+      // Pregătim datele pentru grafic
+      const categorii = {};
+    data.forEach(item => {
+      const denumire = item.categorie_cheltuiala?.denumire || "Necunoscut";
+      categorii[denumire] = (categorii[denumire] || 0) + item.suma;
+    });
+
+    const labels = Object.keys(categorii);
+    const values = Object.values(categorii);
+
+    const palette = d3.schemeSet3; // conține 12 culori
+    const colors = palette.slice(0, labels.length); // folosește doar câte ai nevoie
+    
+    setPlotData({
+      labels,
+      values,
+      type: 'pie',
+      textinfo: 'label+percent',
+      hole: 0.4,
+      marker: {
+        colors: colors,
+      }
+    });
     } catch (err) {
       console.error("Eroare la preluarea cheltuielilor:", err);
     }
@@ -85,7 +113,7 @@ const HomePage = () => {
       <nav className="navbar">
         <div className="left-logo">WisePocket</div>
         <div className="center-links">
-          <Link to="/">General</Link>
+          <Link to="/general">General</Link>
           <Link to="/bugete">Bugete</Link>
         </div>
         <div className="right-menu">
@@ -175,10 +203,26 @@ const HomePage = () => {
           </div>
 
           {/* Al doilea cadran */}
-          <div className="card">
-            <h2>Al doilea cadran</h2>
-            {/* viitor conținut */}
-          </div>
+<div className="card">
+  <h2>Distribuția cheltuielilor pe categorii</h2>
+  {plotData ? (
+    <Plot
+      data={[plotData]}
+      layout={{
+        title: 'Distribuția cheltuielilor pe categorii',
+        height: 400,
+        width: 400,
+        showlegend: true,
+        paper_bgcolor: "#d6c8b9",  // fundalul cadranului
+        plot_bgcolor: "#d6c8b9"  // fundalul graficului
+      }}
+    />
+  ) : (
+    <p style={{ textAlign: "center", color: "#888" }}>
+      Nu există date pentru grafic
+    </p>
+  )}
+</div>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { bugetController } = require("../controllers");
 
+router.get("/user/:userId", bugetController.getBugeteByUser);
 router.get("/", bugetController.getAllBugete);
 router.get("/:id", bugetController.getBugetById);
 router.post("/", bugetController.createBuget);

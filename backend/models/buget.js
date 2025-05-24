@@ -20,7 +20,8 @@ const bugetModel = (sequelize, DataTypes) => {
         data_inceput:{
             type: DataTypes.DATE,
             allowNull: false
-        }
+        },
+
     },{
         
         underscored: true,
