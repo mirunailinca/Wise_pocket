@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 👈 Asta e nouă
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
-  const navigate = useNavigate(); // 👈 Inițializezi navigatorul
+  const navigate = useNavigate();
 
   const [nume, setNume] = useState("");
   const [prenume, setPrenume] = useState("");
   const [email, setEmail] = useState("");
   const [parola, setParola] = useState("");
-  const [rol, setRol] = useState("user");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +18,7 @@ const SignupPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nume, prenume, email, parola, rol }),
+        body: JSON.stringify({ nume, prenume, email, parola, rol: "user" }),
       });
 
       const data = await response.json();
@@ -30,69 +29,48 @@ const SignupPage = () => {
       }
 
       alert("Cont creat cu succes!");
-      navigate("/"); // 👈 Redirecționează către pagina de login
+      navigate("/"); // Redirecționează către login
     } catch (err) {
       alert("Eroare la trimiterea formularului: " + err.message);
     }
   };
 
   return (
-    <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
-      <h2>Creare cont nou</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Nume"
-          value={nume}
-          onChange={(e) => setNume(e.target.value)}
-          required
-        /><br />
-
-        <input
-          type="text"
-          placeholder="Prenume"
-          value={prenume}
-          onChange={(e) => setPrenume(e.target.value)}
-          required
-        /><br />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        /><br />
-
-        <input
-          type="password"
-          placeholder="Parolă"
-          value={parola}
-          onChange={(e) => setParola(e.target.value)}
-          required
-        /><br />
-
-        <div style={{ margin: "10px 0" }}>
-          <label>
-            <input
-              type="radio"
-              value="user"
-              checked={rol === "user"}
-              onChange={() => setRol("user")}
-            /> Utilizator
-          </label>
-          <label style={{ marginLeft: "20px" }}>
-            <input
-              type="radio"
-              value="admin"
-              checked={rol === "admin"}
-              onChange={() => setRol("admin")}
-            /> Admin
-          </label>
-        </div>
-
-        <button type="submit">Creează cont</button>
-      </form>
+    <div className="login-container">
+      <div className="login-box">
+        <h1>Creare cont nou</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Nume"
+            value={nume}
+            onChange={(e) => setNume(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Prenume"
+            value={prenume}
+            onChange={(e) => setPrenume(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Parolă"
+            value={parola}
+            onChange={(e) => setParola(e.target.value)}
+            required
+          />
+          <button type="submit" className="primary-button">Creează cont</button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -43,7 +43,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
+  <div className="login-container">
+    <div className="login-box">
       <h1>Login</h1>
       <input
         type="text"
@@ -57,11 +58,13 @@ const LoginPage = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleLogin}>Conectează-te</button>
+      <button className="primary-button" onClick={handleLogin}>Conectează-te</button>
       <p>Nu ai cont?</p>
-      <button onClick={handleSignUpRedirect}>Creează cont nou</button>
+      <button className="secondary-button" onClick={handleSignUpRedirect}>Creează cont nou</button>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default LoginPage;

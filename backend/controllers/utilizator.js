@@ -1,4 +1,5 @@
 const UtilizatorDb = require("../models").utilizator;
+const { utilizator: Utilizator, recompensa: Recompensa } = require("../models");
 
 const controller = {
     createUtilizator: async (req, res) => {
@@ -61,7 +62,33 @@ const controller = {
         } catch (err) {
           res.status(500).send(err.message);
         }
+      },
+
+      getProfilComplet: async (req, res) => {
+    try {
+      const userId = req.params.id;
+
+      const utilizator = await Utilizator.findByPk(userId);
+      if (!utilizator) return res.status(404).json({ error: "Utilizatorul nu a fost găsit" });
+
+      const recompensa = await Recompensa.findOne({
+        where: { utilizator_id: userId }
+      });
+
+      const puncte = recompensa ? recompensa.puncte : 0;
+
+      res.status(200).json({
+        id: utilizator.id,
+        nume: utilizator.nume,
+        prenume: utilizator.prenume,
+        email: utilizator.email,
+        puncte
+      });
+
+      } catch (err) {
+        res.status(500).json({ error: err.message });
       }
+  }
 }
 
 module.exports = controller;

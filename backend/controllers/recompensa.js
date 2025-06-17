@@ -1,11 +1,13 @@
-const RecompensaDb = require("../models").recompensa;
+const { recompensa: RecompensaDb, buget: Buget, cheltuiala: Cheltuiala } = require("../models");
+const { Op } = require("sequelize");
+const dayjs = require("dayjs");
 
 const controller = {
   createRecompensa: async (req, res) => {
     try {
       const recompensa = await RecompensaDb.create({
         puncte: req.body.puncte,
-        id_utilizator: req.body.id_utilizator,
+        utilizator_id: req.body.utilizator_id,
       });
       res.status(201).send(recompensa);
     } catch (err) {
@@ -53,6 +55,47 @@ const controller = {
       res.status(200).send(recompensa);
     } catch (err) {
       res.status(500).send(err.message);
+    }
+  },
+
+  // ✅ Logica de verificare a bugetelor și acordare de puncte
+  verificaRecompense: async (req, res) => {
+    try {
+      const bugete = await Buget.findAll();
+
+      for (const buget of bugete) {
+        const dataFinal = dayjs(buget.data_inceput).add(parseInt(buget.perioada), 'day');
+        if (dataFinal.isAfter(dayjs())) continue;
+
+        const cheltuieli = await Cheltuiala.findAll({
+          where: {
+            utilizator_id: buget.utilizator_id,
+            data: {
+              [Op.between]: [buget.data_inceput, dataFinal.toDate()]
+            }
+          }
+        });
+
+        const total = cheltuieli.reduce((acc, ch) => acc + ch.suma, 0);
+
+        if (total <= buget.suma) {
+          const recompensa = await RecompensaDb.findOne({
+            where: { utilizator_id: buget.utilizator_id }
+          });
+
+          if (recompensa) {
+            recompensa.puncte += 10;
+            await recompensa.save();
+          } else {
+            await RecompensaDb.create({ utilizator_id: buget.utilizator_id, puncte: 10 });
+          }
+        }
+      }
+
+      res.json({ message: "Recompense verificate și actualizate cu succes." });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Eroare la verificarea recompenselor." });
     }
   }
 };
