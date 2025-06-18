@@ -8,9 +8,11 @@ const Bugete = () => {
   const [showForm, setShowForm] = useState(false);
   const [suma, setSuma] = useState("");
   const [perioada, setPerioada] = useState("");
-  const [denumire, setDenumire] = useState(""); // <-- NOU
+  const [denumire, setDenumire] = useState("");
   const [dataInceput, setDataInceput] = useState("");
   const [bugete, setBugete] = useState([]);
+  const [selectedBuget, setSelectedBuget] = useState(null);
+  const [progres, setProgres] = useState(null);
 
   const toggleMenu = () => setShowMenu(!showMenu);
   const toggleForm = () => setShowForm(!showForm);
@@ -30,6 +32,20 @@ const Bugete = () => {
     }
   };
 
+  const handleSelectBuget = async (buget) => {
+    setSelectedBuget(buget);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:4848/bugete/${buget.id}/progres`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setProgres({ sumaAlocata: data.sumaAlocata, totalCheltuit: data.totalCheltuit });
+    } catch (err) {
+      console.error("Eroare la obținerea progresului bugetului:", err);
+    }
+  };
+
   const handleAdaugaBuget = async (e) => {
     e.preventDefault();
     try {
@@ -45,18 +61,19 @@ const Bugete = () => {
           perioada,
           data_inceput: dataInceput,
           utilizator_id: userId,
+          denumire
         }),
       });
 
       if (!response.ok) throw new Error("Eroare la adăugarea bugetului");
       const bugetNou = await response.json();
 
-      bugetNou.denumire = denumire; // <-- atașăm titlul local
+      bugetNou.denumire = denumire;
 
       setBugete((prev) => [bugetNou, ...prev]);
       setSuma("");
       setPerioada("");
-      setDenumire(""); // <-- resetăm titlul
+      setDenumire("");
       setDataInceput("");
       setShowForm(false);
     } catch (err) {
@@ -70,7 +87,6 @@ const Bugete = () => {
 
   return (
     <div>
-      {/* Navbar */}
       <nav className="navbar">
         <div className="left-logo">WisePocket</div>
         <div className="center-links">
@@ -94,7 +110,6 @@ const Bugete = () => {
         <p>Vizualizează și gestionează bugetele alocate pe categorii sau scopuri.</p>
 
         <div className="dashboard-container">
-          {/* Cadran 1 – Bugete alocate */}
           <div className="card">
             <div className="card-header">
               <h2>Bugete Alocate</h2>
@@ -158,7 +173,12 @@ const Bugete = () => {
                   sfarsit.setDate(inceput.getDate() + durataZile);
 
                   return (
-                    <li key={item.id} className="cheltuiala-item">
+                    <li
+                      key={item.id}
+                      className="cheltuiala-item"
+                      onClick={() => handleSelectBuget(item)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <div className="left">
                         <strong>{item.denumire || "Buget fără titlu"}</strong><br />
                         <small>
@@ -175,10 +195,56 @@ const Bugete = () => {
             </ul>
           </div>
 
-          {/* Cadran 2 – temporar gol */}
           <div className="card">
-            <h2>Vizualizări bugete</h2>
-            <p style={{ textAlign: "center", color: "#888" }}>Conținutul va fi adăugat ulterior.</p>
+            <h2 style={{ marginBottom: "20px" }}>Progres buget</h2>
+            {selectedBuget && progres ? (
+              <div>
+                <p><strong>{selectedBuget.denumire}</strong></p>
+                <p style={{ fontSize: "13px", color: "#555", marginBottom: "5px" }}>
+                  {new Date(selectedBuget.data_inceput).toLocaleDateString()} – {(() => {
+                    const sf = new Date(selectedBuget.data_inceput);
+                    if (selectedBuget.perioada === "saptamana") sf.setDate(sf.getDate() + 7);
+                    else if (selectedBuget.perioada === "luna") sf.setDate(sf.getDate() + 30);
+                    else sf.setDate(sf.getDate() + 365);
+                    return sf.toLocaleDateString();
+                  })()}
+                </p>
+                {(() => {
+                  const procent = (progres.totalCheltuit / progres.sumaAlocata) * 100;
+                  let culoare = "#6A3937";
+                  if (procent < 70) culoare = "#4CAF50";
+                  else if (procent < 100) culoare = "#FFA500";
+                  else culoare = "#B00020";
+                  return (
+                    <>
+                      <div style={{ background: "#eee", borderRadius: "10px", height: "20px", width: "100%" }}>
+                        <div
+                          style={{
+                            width: `${Math.min(procent, 100)}%`,
+                            background: culoare,
+                            height: "100%",
+                            borderRadius: "10px"
+                          }}
+                        />
+                      </div>
+                      <p style={{ marginTop: "15px", color: culoare }}>
+                        {Math.round(procent)}% din buget utilizat
+                      </p>
+                      {procent > 100 && (
+                        <p style={{ color: culoare, fontWeight: "bold" }}>
+                          ⚠️ Ai depășit bugetul cu {(progres.totalCheltuit - progres.sumaAlocata).toFixed(2)} RON!
+                        </p>
+                      )}
+                      <p style={{ fontSize: "14px", color: "#555" }}>
+                        📉 Cheltuit: <strong>{progres.totalCheltuit} RON</strong> din {progres.sumaAlocata} RON
+                      </p>
+                    </>
+                  );
+                })()}
+              </div>
+            ) : (
+              <p style={{ textAlign: "center", color: "#888" }}>Selectează un buget pentru a vedea progresul.</p>
+            )}
           </div>
         </div>
       </div>

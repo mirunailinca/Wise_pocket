@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const db = require("../models");
 const User = db.utilizator;
 
-const SECRET = "super_secret_jwt_key";
+const SECRET = "cheie-secreta";
 
 // LOGIN
 router.post("/login", async (req, res) => {
@@ -17,18 +17,18 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(401).json({ message: "Email inexistent" });
 
-    console.log("User găsit:", user); //LOG
-    console.log("Parola primită:", parola);//LOG
-    console.log("Hash din DB:", user.parola);//LOG
+    // console.log("User găsit:", user); //LOG
+    // console.log("Parola primită:", parola);//LOG
+    // console.log("Hash din DB:", user.parola);//LOG
 
 
 
     const valid = await bcrypt.compare(parola, user.parola);
-    console.log("Rezultat bcrypt.compare:", valid); //LOG
+    //console.log("Rezultat bcrypt.compare:", valid); //LOG
     if (!valid) return res.status(401).json({ message: "Parolă greșită" });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.tip },
+      { id: user.id, email: user.email, role: user.rol }, //am schimbat din user.tip
       SECRET,
       { expiresIn: "1h" }
     );

@@ -49,14 +49,22 @@ const controller = {
         }
     },
 
-    getAllCheltuieli: async (req,res) => {
-        try{
-            const cheltuieli = await CheltuialaDb.findAll();
+    getAllCheltuieli: async (req, res) => {
+        try {
+            const cheltuieli = await CheltuialaDb.findAll({
+            include: [
+                {
+                model: categorieCheltuiala,
+                attributes: ["denumire"]
+                }
+            ]
+            });
             res.status(200).send(cheltuieli);
-        }catch(err){
+        } catch (err) {
             res.status(500).send(err.message);
         }
-    },
+        },
+
 
     getCheltuialaById: async (req,res) => {
         try{

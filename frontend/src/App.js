@@ -5,6 +5,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import Bugete from "./pages/Bugete";
 import Profil from "./pages/Profil";
+import AdminDashboard from "./pages/AdminDashboard";
+
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
         <Route path="/general" element={<HomePage />} />
         <Route path="/bugete" element={<Bugete />} />
         <Route path="/profil" element={<Profil />} />
+        <Route path="/admin" element={<AdminDashboard />} />
 
       </Routes>
     </Router>

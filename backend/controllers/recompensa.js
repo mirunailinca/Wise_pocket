@@ -57,6 +57,18 @@ const controller = {
       res.status(500).send(err.message);
     }
   },
+  getRecompensaByUserId: async (req, res) => {
+  try {
+    const recompensa = await RecompensaDb.findOne({
+      where: { utilizator_id: req.params.id }
+    });
+    if (!recompensa) return res.status(404).json({ puncte: 0 });
+    res.status(200).json(recompensa);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+,
 
   // ✅ Logica de verificare a bugetelor și acordare de puncte
   verificaRecompense: async (req, res) => {

@@ -27,9 +27,17 @@ const LoginPage = () => {
       localStorage.setItem("token", data.token);
 
       const userData = jwtDecode(data.token);
+
+      //aici logez
+      console.log("DECODED:", jwtDecode(data.token));
+      console.log("USER DATA:", userData);
+      console.log("ROL:", userData.role);
+
       if (userData.role === "admin") {
-        navigate("/admin-home");
+        console.log("Navigare către admin");
+        navigate("/admin");
       } else {
+        console.log("Navigare către general");
         navigate("/general");
       }
     } catch (err) {

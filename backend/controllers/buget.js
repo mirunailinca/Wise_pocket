@@ -5,7 +5,7 @@ const CheltuialaDb = require("../models").cheltuiala;
 const controller = {
   createBuget: async (req, res) => {
     try {
-      const { perioada, suma, utilizator_id, data_inceput } = req.body;
+      const { perioada, suma, utilizator_id, data_inceput, denumire } = req.body;
             if (!perioada || !suma || !utilizator_id || !data_inceput) {
   return res.status(400).send("Toate câmpurile sunt necesare.");
 }
@@ -48,7 +48,8 @@ const controller = {
         perioada,
         suma,
         utilizator_id, //OARE AICI
-        data_inceput
+        data_inceput,
+        denumire
       });
 
       res.status(201).send(buget);
@@ -108,6 +109,42 @@ const controller = {
     res.status(200).json(bugete);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+  },
+
+  getTotalCheltuitPeBuget: async (req, res) => {
+  try {
+    const bugetId = req.params.id;
+    const b = await BugetDb.findByPk(bugetId);
+
+    if (!b) return res.status(404).json({ message: "Bugetul nu a fost găsit" });
+
+    const dataSfarsit = new Date(b.data_inceput);
+
+    if (b.perioada === "saptamana") {
+      dataSfarsit.setDate(dataSfarsit.getDate() + 7);
+    } else if (b.perioada === "luna") {
+      dataSfarsit.setDate(dataSfarsit.getDate() + 30);
+    }
+
+    const cheltuieli = await CheltuialaDb.findAll({
+      where: {
+        utilizator_id: b.utilizator_id,
+        data: {
+          [Op.gte]: new Date(b.data_inceput),
+          [Op.lte]: dataSfarsit
+        }
+      }
+    });
+
+    const totalCheltuit = cheltuieli.reduce((acc, curr) => acc + curr.suma, 0);
+
+    res.status(200).json({
+      sumaAlocata: b.suma,
+      totalCheltuit
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 }
 };

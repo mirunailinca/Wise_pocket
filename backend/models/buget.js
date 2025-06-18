@@ -21,6 +21,10 @@ const bugetModel = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: false
         },
+        denumire: {
+        type: DataTypes.STRING,
+        allowNull: true
+        },
 
     },{
         

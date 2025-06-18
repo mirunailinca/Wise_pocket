@@ -26,6 +26,7 @@ const controller = {
             prenume: req.body.prenume,
             email: req.body.email,
             parola: req.body.parola,
+            rol: req.body.rol,
           });
           res.status(200).send(updated);
         } catch (err) {

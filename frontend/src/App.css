@@ -331,3 +331,7 @@ p {
   font-size: 20px;
   margin-bottom: 10px;
 }
+
+.card.admin-wide {
+  width: 500px; /* sau cât ai nevoie, ex: 520px */
+}
