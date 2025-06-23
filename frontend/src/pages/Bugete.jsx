@@ -106,8 +106,8 @@ const Bugete = () => {
       </nav>
 
       <div className="main-content">
-        <h1>Secțiunea Bugete</h1>
-        <p>Vizualizează și gestionează bugetele alocate pe categorii sau scopuri.</p>
+        {/* <h1>Secțiunea Bugete</h1>
+        <p>Vizualizează și gestionează bugetele alocate pe categorii sau scopuri.</p> */}
 
         <div className="dashboard-container">
           <div className="card">
@@ -232,11 +232,11 @@ const Bugete = () => {
                       </p>
                       {procent > 100 && (
                         <p style={{ color: culoare, fontWeight: "bold" }}>
-                          ⚠️ Ai depășit bugetul cu {(progres.totalCheltuit - progres.sumaAlocata).toFixed(2)} RON!
+                           Ai depășit bugetul cu {(progres.totalCheltuit - progres.sumaAlocata).toFixed(2)} RON!
                         </p>
                       )}
                       <p style={{ fontSize: "14px", color: "#555" }}>
-                        📉 Cheltuit: <strong>{progres.totalCheltuit} RON</strong> din {progres.sumaAlocata} RON
+                         Cheltuit: <strong>{progres.totalCheltuit} RON</strong> din {progres.sumaAlocata} RON
                       </p>
                     </>
                   );

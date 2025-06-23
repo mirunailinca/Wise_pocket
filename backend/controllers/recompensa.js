@@ -70,7 +70,7 @@ const controller = {
 }
 ,
 
-  // ✅ Logica de verificare a bugetelor și acordare de puncte
+  //  Logica de verificare a bugetelor și acordare de puncte
   verificaRecompense: async (req, res) => {
     try {
       const bugete = await Buget.findAll();

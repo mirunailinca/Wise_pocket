@@ -27,7 +27,7 @@ login: async (req, res) => {
       {
         id: userPlain.id,
         email: userPlain.email,
-        rol: userPlain.rol   // 🔥 AICI trebuie să apară în token
+        rol: userPlain.rol   
       },
       SECRET_KEY,
       { expiresIn: "1h" }

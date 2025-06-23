@@ -6,7 +6,7 @@ import SignupPage from "./pages/SignupPage";
 import Bugete from "./pages/Bugete";
 import Profil from "./pages/Profil";
 import AdminDashboard from "./pages/AdminDashboard";
-
+import Sfaturi from './pages/Sfaturi';
 
 function App() {
   return (
@@ -18,6 +18,7 @@ function App() {
         <Route path="/bugete" element={<Bugete />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/sfaturi" element={<Sfaturi />} />
 
       </Routes>
     </Router>

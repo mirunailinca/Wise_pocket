@@ -103,9 +103,7 @@ const AdminDashboard = () => {
       </nav>
 
       <div className="main-content">
-        <h1>Panou Administrativ</h1>
-        <p>Statistici generale privind utilizatorii și cheltuielile</p>
-
+        
         <div className="dashboard-container">
           {/* Stânga */}
           <div className="card">

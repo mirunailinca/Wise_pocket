@@ -130,8 +130,8 @@ const HomePage = () => {
 
       {/* Continut principal */}
       <div className="main-content">
-        <h1>Bine ai venit la WisePocket!</h1>
-        <p>Administrează-ți bugetul într-un mod simplu și eficient</p>
+        {/* <h1>Bine ai venit la WisePocket!</h1>
+        <p>Administrează-ți bugetul într-un mod simplu și eficient</p> */}
 
         <div className="dashboard-container">
           {/* Istoric Cheltuieli */}

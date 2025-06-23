@@ -335,3 +335,12 @@ p {
 .card.admin-wide {
   width: 500px; /* sau cât ai nevoie, ex: 520px */
 }
+.card-sfaturi {
+  width: 80%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 45px;
+}
+.card-sfaturi li {
+  text-align: justify;
+}

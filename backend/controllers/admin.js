@@ -27,13 +27,11 @@ const getOverviewStats = async (req, res) => {
 
     const totalBugete = await buget.count();
 
-    // Număr unic de utilizatori care au cel puțin un buget
     const [rezultat] = await buget.sequelize.query(
       'SELECT COUNT(DISTINCT utilizator_id) AS total FROM buget'
     );
     const utilizatoriCuBugete = rezultat[0].total;
     
-    //medie cheltuieli per utilizator
     const [mediePerUserResult] = await cheltuiala.sequelize.query(
     `SELECT AVG(total) AS medie_per_user
     FROM (
@@ -44,15 +42,14 @@ const getOverviewStats = async (req, res) => {
     );
     const medieCheltuieliPerUtilizator = parseFloat(mediePerUserResult[0].medie_per_user || 0).toFixed(2);
 
-    //medie chelt pe luna 
-const [mediiPeLuna] = await cheltuiala.sequelize.query(
-  `SELECT DATE_FORMAT(data, '%Y-%m') AS luna, 
-          AVG(suma) AS medie
-   FROM cheltuiala
-   GROUP BY luna
-   ORDER BY luna DESC
-   LIMIT 6`
-);
+    const [mediiPeLuna] = await cheltuiala.sequelize.query(
+    `SELECT DATE_FORMAT(data, '%Y-%m') AS luna, 
+            AVG(suma) AS medie
+    FROM cheltuiala
+    GROUP BY luna
+    ORDER BY luna DESC
+    LIMIT 6`
+    );
 
 
     return res.status(200).json({
