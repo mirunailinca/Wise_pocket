@@ -7,6 +7,7 @@ const cheltuialaRouter = require("./cheltuiala");
 const recompensaRouter = require("./recompensa");
 const categorieRouter = require("./categorieCheltuiala");
 const adminRoutes = require('./admin');
+const sfaturiRouter = require("./sfaturi");
 
 router.use("/utilizatori", utilizatorRouter);
 router.use("/bugete", bugetRouter);
@@ -14,5 +15,7 @@ router.use("/cheltuieli", cheltuialaRouter);
 router.use("/recompense", recompensaRouter);
 router.use("/categorii", categorieRouter);
 router.use('/admin', adminRoutes);
+router.use("/sfaturi", sfaturiRouter);
+
 
 module.exports = router;

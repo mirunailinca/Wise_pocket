@@ -10,26 +10,49 @@ const Profil = () => {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   useEffect(() => {
+    console.log("⚠️ useEffect Profil.jsx executat");
+
     const fetchProfil = async () => {
   try {
     const token = localStorage.getItem("token");
     const decoded = jwtDecode(token);
 
-    // 1. Fetch utilizator
+    // 2. Fetch utilizator
     const resUser = await fetch(`http://localhost:4848/utilizatori/${decoded.id}`);
-    const user = await resUser.json(); // ✅ lipsea
+    const user = await resUser.json();
 
-    // 2. Fetch recompensa
-    const resRecomp = await fetch(`http://localhost:4848/recompense/utilizator/${decoded.id}`);
+    // 3. Fetch recompensa actualizată
+    const resRecomp = await fetch("http://localhost:4848/recompensa/verifica", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ utilizator_id: decoded.id })
+    });
     const recompensa = await resRecomp.json();
 
-    // 3. Combinare puncte + utilizator
+    // 4. Combinare
     const profilComplet = {
       ...user,
-      puncte: recompensa?.puncte || 0
+      puncte: recompensa?.puncte || 0,
     };
 
-    setProfil(profilComplet); // ✅ setare profil
+    setProfil(profilComplet);
+    // // 1. Fetch utilizator
+    // const resUser = await fetch(`http://localhost:4848/utilizatori/${decoded.id}`);
+    // const user = await resUser.json(); 
+
+    // // 2. Fetch recompensa
+    // const resRecomp = await fetch(`http://localhost:4848/recompense/utilizator/${decoded.id}`);
+    // const recompensa = await resRecomp.json();
+
+    // // 3. Combinare puncte + utilizator
+    // const profilComplet = {
+    //   ...user,
+    //   puncte: recompensa?.puncte || 0
+    // };
+
+    // setProfil(profilComplet); 
   } catch (err) {
     console.error("Eroare la preluarea profilului:", err);
   }
@@ -53,9 +76,19 @@ const Profil = () => {
   const procent = Math.min((puncte / pragCurent) * 100, 100);
 
   let urlInsigna = null;
-  if (puncte >= 100) urlInsigna = "/insigne/osuta.png";
-  else if (puncte >= 50) urlInsigna = "/insigne/cincizeci.png";
-  else if (puncte >= 10) urlInsigna = "/insigne/zece.png";
+  if (puncte >= 150) urlInsigna = "/insigne/seed5.png";
+  else if (puncte >= 100) urlInsigna = "/insigne/seed4.png";
+  else if (puncte >= 50) urlInsigna = "/insigne/seed3.png";
+  else if (puncte >= 10) urlInsigna = "/insigne/seed2.png";
+  else urlInsigna = "/insigne/seed1.png";
+
+  const getMesajInsigna = (puncte) => {
+  if (puncte >= 150) return "Felicitări! Ai o grădină plină de flori care simbolizează realizările tale financiare.";
+  else if (puncte >= 100) return "Munca ta dă roade! Tocmai a înflorit planta pe care ai crescut-o.";
+  else if (puncte >= 50) return "Încă puțină disciplină ca să înflorească planta, dar și modul tău de gestionare al finanțelor!";
+  else if (puncte >= 10) return "Ești pe drumul cel bun! Planta ta a început să încolțească.";
+  else return "Așa cum o sămânță devine floare, așa și tu poți crește în finanțe!";
+};
 
   return (
     <div>
@@ -111,21 +144,49 @@ const Profil = () => {
   <p>Momentan nu ai nicio insignă. Continuă să respecți bugetele! </p>
 )}
 
-
+{/* 
             {urlInsigna && (
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <img src={urlInsigna} alt="Insignă obținută" style={{ width: "100px", height: "auto" }} />
               </div>
             )}
+             */}
+
+            {urlInsigna && (
+  <div style={{ textAlign: "center", marginTop: "10px" }}>
+    <img src={urlInsigna} alt="Insignă obținută" style={{ width: "100px", height: "auto" }} />
+<p style={{
+  fontSize: "18px",
+  marginTop: "20px",
+  marginBottom: "0",
+  color: "#333",
+  textAlign: "center",
+  fontWeight: "bold"
+}}>
+  ★ {getMesajInsigna(puncte)}
+</p>
+
+  </div>
+)}
+
           </div>
 
           {/* Dreapta: detalii utilizator */}
-          <div className="card">
-            <h2>Profilul tău</h2>
-            <p><strong>Nume:</strong> {profil.nume}</p>
-            <p><strong>Email:</strong> {profil.email}</p>
-            <p><strong>Puncte:</strong> {profil.puncte}</p>
-          </div>
+<div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+  <h2>Profilul tău</h2>
+  <p style={{ color: "#333" }}><strong>Nume:</strong> {profil.nume}</p>
+  <p style={{ color: "#333" }}><strong>Email:</strong> {profil.email}</p>
+  <p style={{ color: "#333" }}><strong>Puncte:</strong> {profil.puncte}</p>
+
+  <div style={{ marginTop: "40px", textAlign: "center", color: "#333" }}>
+    <p style={{ fontWeight: "bold", marginBottom: "5px" }}>Cum obți puncte?</p>
+    <p style={{ fontSize: "14px", margin: 0 }}>★ 10 puncte pentru fiecare buget respectat</p>
+    <p style={{ fontSize: "14px", margin: 0 }}>★ ajută-ți planta să crească acumulând cât mai multe puncte</p>
+
+  </div>
+</div>
+
+
         </div>
       </div>
     </div>

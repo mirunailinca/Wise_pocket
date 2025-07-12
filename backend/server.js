@@ -4,6 +4,7 @@ const allRoutes = require("./routes");
 const authRoutes = require("./routes/auth");
 const recompensaRoutes = require("./routes/recompensa"); 
 const cors = require("cors");
+const sfaturiRoutes = require("./routes/sfaturi");
 
 const app = express();
 const port = 4848;
@@ -14,6 +15,8 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/recompensa", recompensaRoutes); 
+app.use("/sfaturi", sfaturiRoutes);
+
 app.use("/", allRoutes);
 
 app.get("/", (req, res) => {

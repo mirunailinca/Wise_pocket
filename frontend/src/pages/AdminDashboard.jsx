@@ -95,7 +95,7 @@ const AdminDashboard = () => {
           <button onClick={toggleMenu} className="menu-button">☰</button>
           {showMenu && (
             <div className="dropdown-menu">
-              <Link to="/profil">Profil</Link>
+              {/* <Link to="/profil">Profil</Link> */}
               <Link to="/">Deconectare</Link>
             </div>
           )}

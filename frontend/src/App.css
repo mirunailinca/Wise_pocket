@@ -344,3 +344,18 @@ p {
 .card-sfaturi li {
   text-align: justify;
 }
+
+.sfat-markdown p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.card-sfaturi li p {
+  font-size: 16px;
+  color: #000;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  text-align: justify;
+}

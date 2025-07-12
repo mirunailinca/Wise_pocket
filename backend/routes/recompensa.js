@@ -3,6 +3,9 @@ const router = express.Router();
 const { recompensaController } = require("../controllers");
 
 router.get("/verifica", recompensaController.verificaRecompense);
+
+router.post("/verifica", recompensaController.verificaRecompense);
+
 router.get("/", recompensaController.getAllRecompense);
 router.get("/utilizator/:id", recompensaController.getRecompensaByUserId);
 

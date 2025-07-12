@@ -69,47 +69,101 @@ const controller = {
   }
 }
 ,
+// verificaRecompense: async (req, res) => {
+//   try {
+//     const utilizatorId = req.user.id;
 
-  //  Logica de verificare a bugetelor și acordare de puncte
-  verificaRecompense: async (req, res) => {
-    try {
-      const bugete = await Buget.findAll();
+//     // 1. Căutăm bugetele doar pentru acest utilizator
+//     const bugete = await Buget.findAll({
+//       where: { utilizator_id: utilizatorId }
+//     });
 
-      for (const buget of bugete) {
-        const dataFinal = dayjs(buget.data_inceput).add(parseInt(buget.perioada), 'day');
-        if (dataFinal.isAfter(dayjs())) continue;
+//     let puncte = 0;
 
-        const cheltuieli = await Cheltuiala.findAll({
-          where: {
-            utilizator_id: buget.utilizator_id,
-            data: {
-              [Op.between]: [buget.data_inceput, dataFinal.toDate()]
-            }
-          }
-        });
+//     for (const buget of bugete) {
+//       const durataZile = buget.perioada === "saptamana" ? 7 :
+//                          buget.perioada === "luna" ? 30 : 365;
 
-        const total = cheltuieli.reduce((acc, ch) => acc + ch.suma, 0);
+//       const dataFinal = dayjs(buget.data_inceput).add(durataZile, 'day');
 
-        if (total <= buget.suma) {
-          const recompensa = await RecompensaDb.findOne({
-            where: { utilizator_id: buget.utilizator_id }
-          });
+//       // 2. Dacă perioada nu s-a încheiat, ignorăm
+//       if (dayjs().isBefore(dataFinal, 'day')) continue;
 
-          if (recompensa) {
-            recompensa.puncte += 10;
-            await recompensa.save();
-          } else {
-            await RecompensaDb.create({ utilizator_id: buget.utilizator_id, puncte: 10 });
+//       // 3. Căutăm cheltuielile în perioada bugetului
+//       const cheltuieli = await Cheltuiala.findAll({
+//         where: {
+//           utilizator_id: utilizatorId,
+//           data: {
+//             [Op.between]: [dayjs(buget.data_inceput).startOf('day').toDate(), dataFinal.endOf('day').toDate()]
+//           }
+//         }
+//       });
+
+//       const total = cheltuieli.reduce((acc, ch) => acc + ch.suma, 0);
+
+//       // 4. Dacă a respectat bugetul, primește 10 puncte
+//       if (total <= buget.suma) {
+//         puncte += 10;
+//       }
+//     }
+
+//     // 5. Returnăm direct punctele (fără salvare în BD)
+//     res.json({ puncte });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Eroare la verificarea recompenselor." });
+//   }
+// }
+verificaRecompense: async (req, res) => {
+  try {
+    const utilizatorId = req.body.utilizator_id;
+
+    const bugete = await Buget.findAll({
+      where: { utilizator_id: utilizatorId }
+    });
+
+    let puncte = 0;
+
+    for (const buget of bugete)
+   {
+      const durataZile = buget.perioada === "saptamana" ? 7 :
+                         buget.perioada === "luna" ? 30 : 365;
+
+      const dataFinal = dayjs(buget.data_inceput).add(durataZile, 'day');
+      if (dayjs().isBefore(dataFinal, 'day')) continue;
+
+      const cheltuieli = await Cheltuiala.findAll({
+        where: {
+          utilizator_id: utilizatorId,
+          data: {
+            [Op.between]: [
+              dayjs(buget.data_inceput).startOf("day").toDate(),
+              dataFinal.endOf("day").toDate()
+            ]
           }
         }
-      }
+      });
 
-      res.json({ message: "Recompense verificate și actualizate cu succes." });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Eroare la verificarea recompenselor." });
+      const total = cheltuieli.reduce((acc, ch) => acc + ch.suma, 0);
+      if (total <= buget.suma) {
+        puncte += 10;
+      }
+              console.log(
+          `🔍 Buget ID ${buget.id} (${buget.perioada}, ${buget.data_inceput}): ` +
+          `suma alocată = ${buget.suma}, total cheltuit = ${total} ` +
+          `-> ${total <= buget.suma ? "✅ RESPECTAT" : "❌ DEPĂȘIT"}`
+        );
     }
+  
+    res.json({ puncte });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Eroare la verificarea recompenselor." });
   }
+}
+
 };
 
 module.exports = controller;

@@ -29,7 +29,6 @@ const HomePage = () => {
 
       const response = await fetch(`http://localhost:4848/cheltuieli/ultimele/${userId}`);
       const data = await response.json();
-      console.log(data);//////////
       setCheltuieli(data);
 
       // Pregătim datele pentru grafic
@@ -190,14 +189,35 @@ const HomePage = () => {
                   Nu au fost adăugate cheltuieli
                 </p>
               ) : (
-                cheltuieli.map((item) => (
-                  <li key={item.id} className="cheltuiala-item">
-                    <div className="left">
-                    <strong>{item.categorie_cheltuiala?.denumire || "Fără categorie"}</strong>
-                    </div>
-                    <div className="right">{item.suma} RON</div>
-                  </li>
-                ))
+                  <ul className="cheltuieli-list">
+  {cheltuieli.length === 0 ? (
+    <p style={{ textAlign: "center", color: "#888" }}>
+      Nu au fost adăugate cheltuieli
+    </p>
+  ) : (
+    cheltuieli.map((item) => {
+      const dataFormatata = new Date(item.data).toLocaleDateString("ro-RO", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+
+      return (
+        <li key={item.id} className="cheltuiala-item">
+          <div className="left">
+            <strong>{item.categorie_cheltuiala?.denumire || "Fără categorie"}</strong>
+            <div style={{ fontSize: "0.9em", color: "#555" }}>{dataFormatata}</div>
+            {item.detalii && (
+              <div style={{ fontSize: "0.85em", color: "#777" }}>{item.detalii}</div>
+            )}
+          </div>
+          <div className="right">{item.suma} RON</div>
+        </li>
+      );
+    })
+  )}
+</ul>
+
               )}
             </ul>
           </div>

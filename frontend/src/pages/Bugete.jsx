@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../App.css";
 
+
+
 const Bugete = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -26,7 +28,37 @@ const Bugete = () => {
 
       const response = await fetch(`http://localhost:4848/bugete/user/${userId}`);
       const data = await response.json();
-      setBugete(data);
+      // filtrare: doar bugetele active
+const azi = new Date();
+
+const bugeteActive = data.filter((item) => {
+  const inceput = new Date(item.data_inceput);
+  const sfarsit = new Date(inceput);
+  const durataZile =
+    item.perioada === "saptamana" ? 7 :
+    item.perioada === "luna" ? 30 : 365;
+  sfarsit.setDate(inceput.getDate() + durataZile);
+
+  return azi >= inceput && azi <= sfarsit;
+});
+// Sortare crescătoare după data de sfârșit
+bugeteActive.sort((a, b) => {
+  const inceputA = new Date(a.data_inceput);
+  const inceputB = new Date(b.data_inceput);
+
+  const durataA = a.perioada === "saptamana" ? 7 : a.perioada === "luna" ? 30 : 365;
+  const durataB = b.perioada === "saptamana" ? 7 : b.perioada === "luna" ? 30 : 365;
+
+  const sfarsitA = new Date(inceputA);
+  const sfarsitB = new Date(inceputB);
+
+  sfarsitA.setDate(sfarsitA.getDate() + durataA);
+  sfarsitB.setDate(sfarsitB.getDate() + durataB);
+
+  return sfarsitA - sfarsitB; // ↑ ordonare după cine expiră mai devreme
+});
+
+setBugete(bugeteActive);
     } catch (err) {
       console.error("Eroare la preluarea bugetelor:", err);
     }
@@ -199,7 +231,21 @@ const Bugete = () => {
             <h2 style={{ marginBottom: "20px" }}>Progres buget</h2>
             {selectedBuget && progres ? (
               <div>
-                <p><strong>{selectedBuget.denumire}</strong></p>
+                <div style={{ textAlign: "center", marginBottom: "10px" }}>
+  <img
+    src={
+      progres.totalCheltuit <= progres.sumaAlocata
+        ? "/budget/budget-ok.png"
+        : "/budget/budget-exceeded.png"
+    }
+    alt={progres.totalCheltuit <= progres.sumaAlocata ? "În buget" : "Buget depășit"}
+    style={{ width: "60px", height: "60px", marginBottom: "8px" }}
+  />
+  <p style={{ margin: 0, fontWeight: "bold", fontSize: "18px" }}>
+    {selectedBuget.denumire}
+  </p>
+</div>
+
                 <p style={{ fontSize: "13px", color: "#555", marginBottom: "5px" }}>
                   {new Date(selectedBuget.data_inceput).toLocaleDateString()} – {(() => {
                     const sf = new Date(selectedBuget.data_inceput);

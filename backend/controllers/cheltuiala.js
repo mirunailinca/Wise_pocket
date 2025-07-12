@@ -1,6 +1,8 @@
 const { categorieCheltuiala } = require("../models");
 
 const CheltuialaDb = require("../models").cheltuiala;
+const { Op } = require("sequelize");
+
 
 const controller = {
     createCheltuiala: async (req,res) => {
@@ -78,17 +80,27 @@ const controller = {
 
 
     getUltimeleCheltuieliByUser: async (req, res) => {
-        try {
-            const cheltuieli = await CheltuialaDb.findAll({
-                where: { utilizator_id: req.params.userId },
-                include: [{ model: categorieCheltuiala, attributes: ["denumire"] }],
-                order: [["data", "DESC"]],
-                limit: 5
-            });
-            res.status(200).send(cheltuieli);
-        } catch (err) {
-            res.status(500).send(err.message);
-        }
+    try {
+        const userId = req.params.userId;
+        const today = new Date();
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+
+        const cheltuieli = await CheltuialaDb.findAll({
+            where: {
+                utilizator_id: userId,
+                data: {
+                    [Op.between]: [startOfMonth, endOfMonth]
+                }
+            },
+            include: [{ model: categorieCheltuiala, attributes: ["denumire"] }],
+            order: [["data", "DESC"]]
+        });
+
+        res.status(200).send(cheltuieli);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
     },
     getCheltuieliUltimaLunaByUser: async (req, res) => {
     try {
